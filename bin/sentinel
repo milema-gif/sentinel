@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SENTINEL_HOME="${SENTINEL_HOME:-$(cd "$(dirname "$0")/.." && pwd)}"
+export SENTINEL_HOME
+
+case "${1:-help}" in
+  status)
+    shift
+    exec bash "$SENTINEL_HOME/bin/sentinel-status.sh" "$@"
+    ;;
+  doctor)
+    shift
+    exec bash "$SENTINEL_HOME/hooks/behavioral/doctor-analyze.sh" "$@"
+    ;;
+  merge)
+    shift
+    exec bash "$SENTINEL_HOME/bin/sentinel-merge.sh" "$@"
+    ;;
+  version)
+    echo "sentinel v1.1.0"
+    ;;
+  help|--help|-h)
+    echo "Usage: sentinel <command>"
+    echo ""
+    echo "Commands:"
+    echo "  status   Show protection status (PROTECTED / NOT PROTECTED)"
+    echo "  doctor   Validate full Sentinel installation"
+    echo "  merge    Merge Sentinel hooks into Claude Code settings.json"
+    echo "  version  Show version"
+    echo "  help     Show this help"
+    ;;
+  *)
+    echo "Unknown command: $1"
+    echo "Run 'sentinel help' for usage."
+    exit 1
+    ;;
+esac

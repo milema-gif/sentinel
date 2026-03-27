@@ -1,0 +1,96 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 3 bash $SENTINEL_HOME/hooks/behavioral/gate-prompt-reset.sh",
+            "statusMessage": "Resetting behavioral gate..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 5 bash $SENTINEL_HOME/hooks/behavioral/gate-metrics-display.sh",
+            "statusMessage": "Loading behavioral metrics..."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $SENTINEL_HOME/hooks/safety/secret-scan.sh",
+            "statusMessage": "Scanning for secrets..."
+          },
+          {
+            "type": "command",
+            "command": "timeout 3 bash $SENTINEL_HOME/hooks/behavioral/gate-pre-tool.sh",
+            "statusMessage": "Checking behavioral gate..."
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 5 bash $SENTINEL_HOME/hooks/safety/infra-pre-tool.sh",
+            "statusMessage": "Checking infrastructure gate..."
+          },
+          {
+            "type": "command",
+            "command": "timeout 3 bash $SENTINEL_HOME/hooks/safety/bash-mutation-gate.sh",
+            "statusMessage": "Checking Bash mutation gate..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 3 bash $SENTINEL_HOME/hooks/behavioral/gate-track-read.sh",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 10 bash $SENTINEL_HOME/hooks/memory/precompact-checkpoint.sh",
+            "statusMessage": "Saving checkpoint before compaction..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 5 bash $SENTINEL_HOME/hooks/memory/stop-save-gate.sh",
+            "statusMessage": "Checking memory saves..."
+          }
+        ]
+      }
+    ]
+  }
+}
